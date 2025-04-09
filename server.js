@@ -34,6 +34,21 @@ app.post('/customers', (req, res) => {
   res.status(201).json({ id, userId, address, phone });
 });
 
+// Login de usuario
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const users = readData('user');
+
+  const user = users.find(u => u.email === email && u.password === password);
+
+  if (!user) {
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+
+  res.json({ message: 'Login exitoso', user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+});
+
+
 // Obtener lista de clientes
 app.get('/customers', (req, res) => {
   const customers = readData('customer');
@@ -42,10 +57,12 @@ app.get('/customers', (req, res) => {
     const user = users.find(u => u.id === c.userId);
     return {
       id: c.id,
+      userId: c.userId,
       name: user ? user.name : null,
       email: user ? user.email : null,
       address: c.address,
       phone: c.phone
+
     };
   });
   res.json(customerList);
