@@ -111,8 +111,8 @@ app.get('/customers/:customerId/events', (req, res) => {
 // Admin: ver todos los eventos
 app.get('/admin/events', (req, res) => {
   const events = readData('events');
-  const customers = readData('customers');
-  const users = readData('users');
+  const customers = readData('customer');
+  const users = readData('user');
   const services = readData('services');
   const result = events.map(e => {
     const customer = customers.find(c => c.id === e.customerId);
@@ -140,7 +140,7 @@ app.get('/admin/events/:id', (req, res) => {
 
 // Total de clientes
 app.get('/total/customers', (req, res) => {
-  const customers = readData('customers');
+  const customers = readData('customer');
   res.json({ total_customers: customers.length });
 });
 
