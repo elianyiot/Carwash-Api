@@ -16,28 +16,28 @@ const writeData = (file, data) => fs.writeFileSync(`./data/${file}.json`, JSON.s
 
 // Registro de usuario con rol
 app.post('/register', (req, res) => {
-  const users = readData('users');
+  const users = readData('user');
   const { name, email, password, role } = req.body;
   const id = users.length + 1;
   users.push({ id, name, email, password, role });
-  writeData('users', users);
+  writeData('user', users);
   res.status(201).json({ id, name, email, role });
 });
 
 // Completar datos personales (cliente)
 app.post('/customers', (req, res) => {
-  const customers = readData('customers');
+  const customers = readData('customer');
   const { userId, address, phone } = req.body;
   const id = customers.length + 1;
   customers.push({ id, userId, address, phone });
-  writeData('customers', customers);
+  writeData('customer', customers);
   res.status(201).json({ id, userId, address, phone });
 });
 
 // Obtener lista de clientes
 app.get('/customers', (req, res) => {
-  const customers = readData('customers');
-  const users = readData('users');
+  const customers = readData('customer');
+  const users = readData('user');
   const customerList = customers.map(c => {
     const user = users.find(u => u.id === c.userId);
     return {
@@ -53,7 +53,7 @@ app.get('/customers', (req, res) => {
 
 // Endpoint para obtener los admins desde la lista de usuarios
 app.get('/admins', (req, res) => {
-  const users = readData('users'); // Leer los usuarios desde el archivo
+  const users = readData('user'); // Leer los usuarios desde el archivo
   const admins = users.filter(user => user.role === 'admin'); // Filtrar por el rol 'admin'
   
   if (admins.length === 0) {
