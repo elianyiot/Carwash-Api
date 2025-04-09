@@ -51,17 +51,16 @@ app.get('/customers', (req, res) => {
   res.json(customerList);
 });
 
-// Obtener admins disponibles
+// Endpoint para obtener los admins desde la lista de usuarios
 app.get('/admins', (req, res) => {
-  const admins = readData('admins');
-  const users = readData('users');
-  const availableAdmins = admins
-    .filter(a => a.status)
-    .map(a => {
-      const user = users.find(u => u.id === a.userId);
-      return { id: a.id, name: user.name, email: user.email };
-    });
-  res.json(availableAdmins);
+  const users = readData('users'); // Leer los usuarios desde el archivo
+  const admins = users.filter(user => user.role === 'admin'); // Filtrar por el rol 'admin'
+  
+  if (admins.length === 0) {
+    return res.status(404).json({ message: 'No se encontraron admins' });
+  }
+
+  res.json(admins); // Devuelve la lista de admins
 });
 
 // Obtener servicios disponibles
@@ -72,12 +71,29 @@ app.get('/services', (req, res) => {
 // Solicitar un servicio (crear evento)
 app.post('/events', (req, res) => {
   const events = readData('events');
-  const { customerId, vehicleId, serviceId, adminId, date_time, status, comments } = req.body;
-  const id = events.length + 1;
-  events.push({ id, customerId, vehicleId, serviceId, adminId, date_time, status, comments });
-  writeData('events', events);
+  const { customerId, adminId, serviceId, vehicle, date_time, status, comments } = req.body;
+    const id = events.length + 1;
+    events.push({ id, customerId, adminId, serviceId, vehicle, date_time, status, comments });
+    writeData('events', events);
   res.status(201).json({ id });
 });
+
+// Actualizar el estado de un evento
+app.put('/events/:id/status', (req, res) => {
+  const events = readData('events');
+  const event = events.find(e => e.id == req.params.id);
+  
+  if (!event) {
+    return res.status(404).json({ error: 'Evento no encontrado' });
+  }
+
+  const { status } = req.body;
+  event.status = status;
+
+  writeData('events', events);
+  res.json({ message: 'Estado actualizado', event });
+});
+
 
 // Listar eventos de un cliente
 app.get('/customers/:customerId/events', (req, res) => {
