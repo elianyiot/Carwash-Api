@@ -127,16 +127,11 @@ app.get('/customers/:customerId/events', (req, res) => {
 
 
 // Admin: ver todos los eventos
-app.get('/admin/events/:id', (req, res) => {
+app.get('/admin/events', (req, res) => {
   const events = readData('events');
   const users = readData('user');
   const services = readData('services');
   const customers = readData('customer');
-
-  const event = events.find(e => e.id == req.params.id);
-  if (!event) {
-    return res.status(404).json({ error: 'Evento no encontrado' });
-  }
 
   const admin = users.find(u => u.id === event.adminId);
   const customer = customers.find(c => c.id === event.customerId);
