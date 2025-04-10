@@ -125,6 +125,7 @@ app.get('/customers/:customerId/events', (req, res) => {
   res.json(customerEvents);
 });
 
+
 // Admin: ver todos los eventos
 app.get('/admin/events', (req, res) => {
   const events = readData('events');
@@ -133,13 +134,13 @@ app.get('/admin/events', (req, res) => {
   const services = readData('services');
   const result = events.map(e => {
     const customer = customers.find(c => c.id === e.customerId);
-    const user = users.find(u => u.id === customer.userId);
+    const user = customer ? users.find(u => u.id === customer.userId) : null;
     const service = services.find(s => s.id === e.serviceId);
     return {
       id: e.id,
-      customer: user.name,
-      phone: customer.phone,
-      service: service.name,
+      customer: user ? user.name : 'Cliente no encontrado',
+      phone: customer ? customer.phone : 'Teléfono no disponible',
+      service: service ? service.name : 'Servicio no encontrado',
       status: e.status,
       adminId: e.adminId,
       date_time: e.date_time
@@ -147,6 +148,7 @@ app.get('/admin/events', (req, res) => {
   });
   res.json(result);
 });
+
 
 // Admin: ver detalles de un evento
 app.get('/admin/events/:id', (req, res) => {
