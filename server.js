@@ -161,6 +161,7 @@ app.get('/admin/events', (req, res) => {
   const result = events.map(event => {
     const admin = users.find(u => u.id === event.adminId);
     const customer = customers.find(c => c.id === event.customerId);
+
     const user = customer ? users.find(u => u.id === customer.userId) : null;
     
     const service = services.find(s => s.id === event.serviceId);
@@ -169,7 +170,7 @@ app.get('/admin/events', (req, res) => {
       id: event.id,
       customer: user ? user.name : 'Cliente no encontrado',
       phone: customer ? customer.phone : 'No disponible',
-      service: service ? service.name : 'No disponible',
+      service: event.comments,
       admin: admin ? admin.name : 'Admin no encontrado',
       date_time: event.date_time,
       status: event.status,
