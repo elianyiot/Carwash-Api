@@ -127,26 +127,32 @@ app.get('/customers/:customerId/events', (req, res) => {
 
 
 // Admin: ver todos los eventos
-app.get('/admin/events', (req, res) => {
+app.get('/admin/events/:id', (req, res) => {
   const events = readData('events');
-  const customers = readData('customer');
   const users = readData('user');
   const services = readData('services');
-  const result = events.map(e => {
-    const customer = customers.find(c => c.id === e.customerId);
-    const user = customer ? users.find(u => u.id === customer.userId) : null;
-    const service = services.find(s => s.id === e.serviceId);
-    return {
-      id: e.id,
-      customer: user ? user.name : 'Cliente no encontrado',
-      phone: customer ? customer.phone : 'Teléfono no disponible',
-      service: service ? service.name : 'Servicio no encontrado',
-      status: e.status,
-      adminId: e.adminId,
-      date_time: e.date_time
-    };
+  const customers = readData('customer');
+
+  const event = events.find(e => e.id == req.params.id);
+  if (!event) {
+    return res.status(404).json({ error: 'Evento no encontrado' });
+  }
+
+  const admin = users.find(u => u.id === event.adminId);
+  const customer = customers.find(c => c.id === event.customerId);
+  const user = customer ? users.find(u => u.id === customer.userId) : null;
+  const service = services.find(s => s.id === event.serviceId);
+
+  res.json({
+    id: event.id,
+    customer: user ? user.name : 'Cliente no encontrado',
+    phone: customer ? customer.phone : 'No disponible',
+    service: service ? service.name : 'No disponible',
+    admin: admin ? admin.name : 'Admin no encontrado',
+    date_time: event.date_time,
+    status: event.status,
+    comments: event.comments
   });
-  res.json(result);
 });
 
 
