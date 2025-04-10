@@ -112,18 +112,35 @@ app.put('/events/:id/status', (req, res) => {
 });
 
 
-// Listar eventos de un cliente
 app.get('/customers/:customerId/events', (req, res) => {
   const events = readData('events');
   const services = readData('services');
+  const users = readData('user');
+  const customers = readData('customer');
+
+  const customer = customers.find(c => c.id == req.params.customerId);
+  const customerUser = customer ? users.find(u => u.id === customer.userId) : null;
+
   const customerEvents = events
     .filter(e => e.customerId == req.params.customerId)
-    .map(e => ({
-      ...e,
-      service: services.find(s => s.id === e.serviceId)
-    }));
+    .map(e => {
+      const service = services.find(s => s.id === e.serviceId);
+      const admin = users.find(u => u.id === e.adminId);
+
+      return {
+        id: e.id,
+        customer: customerUser ? customerUser.name : 'Cliente no encontrado',
+        admin: admin ? admin.name : 'Admin no encontrado',
+        service: service ? service.name : 'Servicio no disponible',
+        date_time: e.date_time,
+        status: e.status,
+        comments: e.comments
+      };
+    });
+
   res.json(customerEvents);
 });
+
 
 
 // Admin: ver todos los eventos
