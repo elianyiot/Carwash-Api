@@ -211,10 +211,20 @@ app.get('/total/customers', (req, res) => {
 });
 
 // Total de servicios
-app.get('/total/services', (req, res) => {
-  const services = readData('services');
+app.get('/total/events', (req, res) => {
+  const services = readData('events');
   res.json({ total_services: services.length });
 });
+
+// Total de servicios por cliente
+app.get('/customers/:customerId/total-events', (req, res) => {
+  const events = readData('events');
+  const customerId = parseInt(req.params.customerId);
+  const customerEvents = events.filter(e => e.customerId === customerId);
+  
+  res.json({ total_events: customerEvents.length });
+});
+
 
 // Listar productos
 app.get('/products', (req, res) => {
