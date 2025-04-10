@@ -26,6 +26,13 @@ app.post('/register', (req, res) => {
   res.status(201).json({ id, name, email, role });
 });
 
+// Obtener todos los usuarios
+app.get('/user', (req, res) => {
+  const users = readData('user');
+  res.json(users);
+});
+
+
 // Completar datos personales (cliente)
 app.post('/customers', (req, res) => {
   const customers = readData('customer');
