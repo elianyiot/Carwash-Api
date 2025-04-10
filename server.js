@@ -176,9 +176,33 @@ app.get('/admin/events', (req, res) => {
 // Admin: ver detalles de un evento
 app.get('/admin/events/:id', (req, res) => {
   const events = readData('events');
+  const users = readData('user');
+  const customers = readData('customer');
+  const services = readData('services');
+
   const event = events.find(e => e.id == req.params.id);
-  res.json(event);
+  if (!event) {
+    return res.status(404).json({ error: 'Evento no encontrado' });
+  }
+
+  const admin = users.find(u => u.id === event.adminId);
+  const customer = customers.find(c => c.id === event.customerId);
+  const customerUser = customer ? users.find(u => u.id === customer.userId) : null;
+  const service = services.find(s => s.id === event.serviceId);
+
+  res.json({
+    id: event.id,
+    customer: customerUser ? customerUser.name : 'Cliente no encontrado',
+    phone: customer ? customer.phone : 'No disponible',
+    service: service ? service.name : 'Servicio no disponible',
+    admin: admin ? admin.name : 'Admin no encontrado',
+    date_time: event.date_time,
+    status: event.status,
+    comments: event.comments,
+    vehicle: event.vehicle
+  });
 });
+
 
 // Total de clientes
 app.get('/total/customers', (req, res) => {
